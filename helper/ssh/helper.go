@@ -5,10 +5,8 @@ import (
 	"bit-agent/util/cli"
 )
 
-func StartAgent(key string) {
+func StartAgent(keys []string) {
 	cli.Debug("Starting SSH agent...")
-	go ssh.StartSSHAgent(key)
-
-	cli.Success("SSH agent started.")
+	go ssh.StartSSHAgent(keys)
 	cli.Notice("The agent is listening via the " + ssh.GetSocketPath() + " socket.")
 }

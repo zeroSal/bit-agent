@@ -6,6 +6,17 @@ import (
 	"golang.org/x/term"
 )
 
+func Section(title string) {
+	var dashes []byte
+	for range len(title) {
+		dashes = append(dashes, '-')
+	}
+
+	fmt.Println()
+	fmt.Println(title)
+	fmt.Println(string(dashes))
+}
+
 func Line(text string) {
 	fmt.Println(text)
 }

@@ -19,7 +19,7 @@ func GetSocketPath() string {
 	return socketPath
 }
 
-func StartSSHAgent(privateKey string) {
+func StartSSHAgent(keys []string) {
 	sockPath, err := expandPath(socketPath)
 	if err != nil {
 		fmt.Println("Failed to expand the socket path.")
@@ -38,14 +38,21 @@ func StartSSHAgent(privateKey string) {
 	defer l.Close()
 
 	sshAgent := agent.NewKeyring()
-	key, err := ssh.ParseRawPrivateKey([]byte(privateKey))
-	if err != nil {
-		log.Fatalf("Failed to parse private key: %v", err)
+
+	var parsedKeys []interface{}
+	for _, key := range keys {
+		parsedKey, err := ssh.ParseRawPrivateKey([]byte(key))
+		if err != nil {
+			log.Fatalf("Failed to parse private key: %v", err)
+		}
+		parsedKeys = append(parsedKeys, parsedKey)
 	}
 
-	addedKey := agent.AddedKey{PrivateKey: key}
-	if err := sshAgent.Add(addedKey); err != nil {
-		log.Fatalf("Failed to add key to agent: %v", err)
+	for _, key := range parsedKeys {
+		addedKey := agent.AddedKey{PrivateKey: key}
+		if err := sshAgent.Add(addedKey); err != nil {
+			log.Fatalf("Failed to add key to agent: %v", err)
+		}
 	}
 
 	signalChan := make(chan os.Signal, 1)

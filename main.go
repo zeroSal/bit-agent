@@ -9,12 +9,18 @@ import (
 func main() {
 	cli.Text(cli.Logo())
 
+	cli.Section("Authentication")
 	session := bitwardenHelper.Authenticate()
+	cli.Success("The authentication was successfully completed.")
 
-	name := cli.Ask("Bitwarden item name: ")
-	key := bitwardenHelper.RetrieveKey(session, name)
+	cli.Section("Key(s) retrieving")
+	folder := bitwardenHelper.RetrieveSshFolder(session)
+	keys := bitwardenHelper.RetrieveSshKeys(session, folder)
+	cli.Success("The key(s) has been successully loaded.")
 
-	sshHelper.StartAgent(key)
+	cli.Section("Agent setup")
+	sshHelper.StartAgent(keys)
+	cli.Success("The agent has been successfully started.")
 
 	select {}
 }

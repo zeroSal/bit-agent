@@ -4,6 +4,8 @@ import (
 	"bit-agent/service/bitwarden"
 	"bit-agent/util/cli"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func Authenticate() (session string) {
@@ -21,14 +23,69 @@ func Authenticate() (session string) {
 	return login()
 }
 
-func RetrieveKey(session string, name string) (key string) {
+func RetrieveKeyByName(session string, name string) (key string) {
 	cli.Debug("Retrieving the \"" + name + "\" key...")
-	sshKey := bitwarden.GetNotesItem(session, name)
+	sshKey, errOut, success := bitwarden.GetNotesItem(session, name)
+	if !success {
+		cli.Error("Key retrieving failed.\n" + errOut)
+		os.Exit(1)
+	}
+
 	if sshKey == "" {
 		cli.Warning("The SSH key retrieved seems empty.")
 	}
 
 	return sshKey
+}
+
+func RetrieveSshFolder(session string) (folder bitwarden.Folder) {
+	cli.Debug("Listing all folders...")
+	folders, errOut, success := bitwarden.ListFolders(session)
+	if !success {
+		cli.Error("Cannot retrieve folders.\n" + errOut)
+		os.Exit(1)
+	}
+
+	for _, folder := range folders {
+		if folder.Name == "SSH" {
+			return folder
+		}
+	}
+
+	cli.Error("The SSH folder was not found.")
+	os.Exit(1)
+
+	return bitwarden.Folder{}
+}
+
+func RetrieveSshKeys(session string, folder bitwarden.Folder) (keys []string) {
+	cli.Debug("Listing all items in \"" + folder.Name + "\"" + " folder...")
+	items, errOut, success := bitwarden.ListItemsInFolder(session, folder)
+	if !success {
+		cli.Error("Cannot retrieve items in folder.\n" + errOut)
+		os.Exit(1)
+	}
+
+	var keysArray []string
+	skipped := 0
+
+	for _, item := range items {
+		if strings.Contains(item.Notes, "PRIVATE KEY") {
+			keysArray = append(keysArray, item.Notes)
+			continue
+		}
+		skipped++
+	}
+
+	if len(keysArray) < 1 {
+		cli.Error("No keys loaded.")
+		os.Exit(1)
+	}
+
+	cli.Notice("Loaded " + strconv.Itoa(len(keysArray)) + " key(s).")
+	cli.Warning("Skipped " + strconv.Itoa(skipped) + " item(s) as it seems not to be an SSH key.")
+
+	return keysArray
 }
 
 func login() (session string) {
