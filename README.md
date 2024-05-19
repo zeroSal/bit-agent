@@ -1,7 +1,7 @@
 # bit-agent
 Unofficial Bitwarden SSH agent.
 
-![bit-agent](https://github.com/zeroSal/bit-agent/assets/38191926/d46c1074-8179-4ace-9d1d-a55c558b88af)
+![ssh](https://github.com/zeroSal/bit-agent/assets/38191926/5c20ff90-790f-45db-b79a-6c494cef7c89)
 
 [Icon by Freepik](https://www.flaticon.com/free-icons/partnership)
 
