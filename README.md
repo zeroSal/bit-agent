@@ -1,3 +1,4 @@
+[![Release](https://github.com/zeroSal/bit-agent/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/zeroSal/bit-agent/actions/workflows/go.yml)
 # bit-agent
 Unofficial Bitwarden SSH agent.
 
