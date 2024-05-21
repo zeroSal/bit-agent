@@ -69,7 +69,13 @@ func StartSSHAgent(keys []string) {
 			log.Printf("Failed to accept connection: %v", err)
 			continue
 		}
-		go agent.ServeAgent(sshAgent, conn)
+		go func(conn net.Conn) {
+			err := agent.ServeAgent(sshAgent, conn)
+			if err != nil && err.Error() != "EOF" {
+				log.Printf("Failed to serve agent: %v", err)
+				conn.Close()
+			}
+		}(conn)
 	}
 }
 
