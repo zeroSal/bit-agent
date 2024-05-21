@@ -61,6 +61,9 @@ jobs:
           echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
           echo "GOOS=$GOOS" >> $GITHUB_ENV
           echo "GOARCH=$GOARCH" >> $GITHUB_ENV
+      - name: Dependencies
+        run: |
+          go mod tidy
       - name: Build
         run: |
           go build -o "$BINARY_NAME" -v
