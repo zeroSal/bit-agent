@@ -1,9 +1,10 @@
 # bit-agent
 Unofficial Bitwarden SSH agent.
 
-![ssh](https://github.com/zeroSal/bit-agent/assets/38191926/5c20ff90-790f-45db-b79a-6c494cef7c89)
+![bit-agent-icon](https://github.com/zeroSal/bit-agent/assets/38191926/a6baaad0-61be-4305-b55b-d78935edb00e)
 
-[Icon by Freepik](https://www.flaticon.com/free-icons/partnership)
+
+The icon is a mashup of two [Freepik](https://www.flaticon.com/free-icons/partnership) icons.
 
 ## Why this project?
 Bitwarden stands out as one of the premier password managers available today. However, it lacks a critical feature for software developers: the management and injection of SSH keys. This project addresses this significant shortcoming, thereby enabling even advanced users to fully appreciate and be satisfied with this password manager.
