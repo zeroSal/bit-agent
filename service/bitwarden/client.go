@@ -7,6 +7,7 @@ import (
 	"os/exec"
 )
 
+// Logins an account to Bitwarden
 func Login(email string, password string) (session string, errOut string, success bool) {
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer
@@ -23,6 +24,7 @@ func Login(email string, password string) (session string, errOut string, succes
 	return stdout.String(), "", true
 }
 
+// Cheks if an account is authenticated.
 func IsAuthenticated() (authenticated bool, errOut string, success bool) {
 	var response map[string]interface{}
 	var stderr bytes.Buffer
@@ -45,6 +47,8 @@ func IsAuthenticated() (authenticated bool, errOut string, success bool) {
 	return response["status"] != "unauthenticated", "", true
 }
 
+// Unlocks the vault.
+// The vault needs to be already authenticated.
 func Unlock(password string) (session string, errOut string, success bool) {
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer
@@ -59,6 +63,21 @@ func Unlock(password string) (session string, errOut string, success bool) {
 	}
 
 	return stdout.String(), "", true
+}
+
+// Synchronized the changes in the vault.
+func Sync(session string) (errOut string, success bool) {
+	cmd := exec.Command("bw", "sync")
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, "BW_SESSION="+session)
+
+	err := cmd.Run()
+
+	if err != nil {
+		return err.Error(), false
+	}
+
+	return "", true
 }
 
 // Retrieves the notes item content.
@@ -111,6 +130,8 @@ func ListFolders(session string) (folders []Folder, errOut string, success bool)
 	return validFolders, "", true
 }
 
+// List all items in the given folder.
+// A logged in session must be provided.
 func ListItemsInFolder(session string, folder Folder) (items []Item, errOut string, success bool) {
 	var response []Item
 	var stderr bytes.Buffer

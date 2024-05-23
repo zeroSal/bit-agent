@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func Authenticate() (session string) {
@@ -83,9 +84,33 @@ func RetrieveSshKeys(session string, folder bitwarden.Folder) (keys []string) {
 	}
 
 	cli.Notice("Loaded " + strconv.Itoa(len(keysArray)) + " key(s).")
-	cli.Warning("Skipped " + strconv.Itoa(skipped) + " item(s) as it seems not to be an SSH key.")
+
+	if skipped > 0 {
+		cli.Warning("Skipped " + strconv.Itoa(skipped) + " item(s) as it seems not to be an SSH key.")
+	}
 
 	return keysArray
+}
+
+func StartSync(session string) {
+	cli.Debug("Starting the sync thread...")
+	go periodicallySync(session)
+}
+
+func periodicallySync(session string) {
+	for {
+		sync(session)
+		time.Sleep(10 * time.Second)
+	}
+}
+
+func sync(session string) {
+	errOut, success := bitwarden.Sync(session)
+
+	if !success {
+		cli.Error("Sync failed.\n" + errOut)
+		os.Exit(1)
+	}
 }
 
 func login() (session string) {

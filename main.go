@@ -13,6 +13,10 @@ func main() {
 	session := bitwardenHelper.Authenticate()
 	cli.Success("The authentication was successfully completed.")
 
+	cli.Section("Sync thread startup")
+	bitwardenHelper.StartSync(session)
+	cli.Success("The sync thread has been started.")
+
 	cli.Section("Key(s) retrieving")
 	folder := bitwardenHelper.RetrieveSshFolder(session)
 	keys := bitwardenHelper.RetrieveSshKeys(session, folder)
