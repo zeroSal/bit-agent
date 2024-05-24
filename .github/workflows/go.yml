@@ -66,7 +66,7 @@ jobs:
           go mod tidy
       - name: Build
         run: |
-          go build -o "$BINARY_NAME" -v
+          go build -ldflags "-X main.version=$GITHUB_REF_NAME" -o "$BINARY_NAME" -v
       - name: Release
         uses: softprops/action-gh-release@v1
         with:

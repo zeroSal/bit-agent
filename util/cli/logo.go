@@ -1,9 +1,13 @@
 package cli
 
-func Logo() string {
-	return `
+import "fmt"
+
+func Logo(version string) string {
+	logo := `
 ┳┓•   ┏┓          [ • Unofficial Bitwarden SSH agent • ]
 ┣┫┓╋━━┣┫┏┓┏┓┏┓╋   [ • Luca Saladino, Lecco, Italy • ]
-┻┛┗┗  ┛┗┗┫┗ ┛┗┗   [ • vdev • ]
+┻┛┗┗  ┛┗┗┫┗ ┛┗┗   [ • v%s • ]
          ┛`
+
+	return fmt.Sprintf(logo, version)
 }

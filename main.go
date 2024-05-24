@@ -6,8 +6,10 @@ import (
 	"bit-agent/util/cli"
 )
 
+var version = "dev"
+
 func main() {
-	cli.Text(cli.Logo())
+	cli.Text(cli.Logo(version))
 
 	cli.Section("Authentication")
 	session := bitwardenHelper.Authenticate()
