@@ -15,11 +15,11 @@ import (
 
 const socketPath string = "~/.bitwarden_ssh_agent.sock"
 
-func GetSocketPath() string {
+func getSocketPath() string {
 	return socketPath
 }
 
-func StartSSHAgent(keys []string) {
+func startSSHAgent(keys []string) {
 	sockPath, err := expandPath(socketPath)
 	if err != nil {
 		fmt.Println("Failed to expand the socket path.")

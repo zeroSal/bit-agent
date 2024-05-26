@@ -1,7 +1,6 @@
-package helper
+package bitwarden
 
 import (
-	"bit-agent/service/bitwarden"
 	"bit-agent/util/cli"
 	"os"
 	"strconv"
@@ -11,22 +10,22 @@ import (
 
 func Authenticate() (session string) {
 	cli.Debug("Checking for authentication...")
-	authenticated, errOut, success := bitwarden.IsAuthenticated()
+	authenticated, errOut, success := isAuthenticated()
 	if !success {
 		cli.Error("Cannot check for authentication.\n" + errOut)
 		os.Exit(1)
 	}
 
 	if authenticated {
-		return unlock()
+		return Unlock()
 	}
 
-	return login()
+	return Login()
 }
 
 func RetrieveKeyByName(session string, name string) (key string) {
 	cli.Debug("Retrieving the \"" + name + "\" key...")
-	sshKey, errOut, success := bitwarden.GetNotesItem(session, name)
+	sshKey, errOut, success := getNotesItem(session, name)
 	if !success {
 		cli.Error("Key retrieving failed.\n" + errOut)
 		os.Exit(1)
@@ -39,9 +38,9 @@ func RetrieveKeyByName(session string, name string) (key string) {
 	return sshKey
 }
 
-func RetrieveSshFolder(session string) (folder bitwarden.Folder) {
+func RetrieveSshFolder(session string) (folder Folder) {
 	cli.Debug("Listing all folders...")
-	folders, errOut, success := bitwarden.ListFolders(session)
+	folders, errOut, success := listFolders(session)
 	if !success {
 		cli.Error("Cannot retrieve folders.\n" + errOut)
 		os.Exit(1)
@@ -56,12 +55,12 @@ func RetrieveSshFolder(session string) (folder bitwarden.Folder) {
 	cli.Error("The SSH folder was not found.")
 	os.Exit(1)
 
-	return bitwarden.Folder{}
+	return Folder{}
 }
 
-func RetrieveSshKeys(session string, folder bitwarden.Folder) (keys []string) {
+func RetrieveSshKeys(session string, folder Folder) (keys []string) {
 	cli.Debug("Listing all items in \"" + folder.Name + "\"" + " folder...")
-	items, errOut, success := bitwarden.ListItemsInFolder(session, folder)
+	items, errOut, success := listItemsInFolder(session, folder)
 	if !success {
 		cli.Error("Cannot retrieve items in folder.\n" + errOut)
 		os.Exit(1)
@@ -104,8 +103,8 @@ func periodicallySync(session string) {
 	}
 }
 
-func sync(session string) {
-	errOut, success := bitwarden.Sync(session)
+func Sync(session string) {
+	errOut, success := sync(session)
 
 	if !success {
 		cli.Error("Sync failed.\n" + errOut)
@@ -113,12 +112,12 @@ func sync(session string) {
 	}
 }
 
-func login() (session string) {
+func Login() (session string) {
 	email := cli.Ask("Bitwarden email: ")
 	password := cli.AskHidden("Bitwarden master password: ")
 
 	cli.Debug("Logging into Bitwarden...")
-	session, errOut, success := bitwarden.Login(email, string(password))
+	session, errOut, success := login(email, string(password))
 	if !success {
 		cli.Error("Login failed.\n" + errOut)
 		os.Exit(1)
@@ -127,15 +126,37 @@ func login() (session string) {
 	return session
 }
 
-func unlock() (session string) {
+func Unlock() (session string) {
 	password := cli.AskHidden("Bitwarden master password: ")
 
 	cli.Debug("Unlocking the vault...")
-	session, errOut, success := bitwarden.Unlock(string(password))
+	session, errOut, success := unlock(string(password))
 	if !success {
 		cli.Error("Unlock failed.\n" + errOut)
 		os.Exit(1)
 	}
 
 	return session
+}
+
+func CheckInstallation() {
+	cli.Debug("Checking the Bitwarden CLI installation...")
+	_, _, success := getVersion()
+
+	if !success {
+		cli.Error("The Bitwarden CLI seems not installed or it doesn't work.")
+		os.Exit(1)
+	}
+}
+
+func Version() (version string) {
+	cli.Debug("Retrieving the Bitwarden CLI version...")
+	v, _, success := getVersion()
+
+	if !success {
+		cli.Error("The Bitwarden CLI seems not installed or it doesn't work.")
+		os.Exit(1)
+	}
+
+	return v
 }

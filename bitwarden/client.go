@@ -8,7 +8,11 @@ import (
 )
 
 // Logins an account to Bitwarden
-func Login(email string, password string) (session string, errOut string, success bool) {
+func login(email string, password string) (
+	session string,
+	errOut string,
+	success bool,
+) {
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer
 
@@ -24,8 +28,12 @@ func Login(email string, password string) (session string, errOut string, succes
 	return stdout.String(), "", true
 }
 
-// Cheks if an account is authenticated.
-func IsAuthenticated() (authenticated bool, errOut string, success bool) {
+// Checks if an account is authenticated.
+func isAuthenticated() (
+	authenticated bool,
+	errOut string,
+	success bool,
+) {
 	var response map[string]interface{}
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer
@@ -49,7 +57,11 @@ func IsAuthenticated() (authenticated bool, errOut string, success bool) {
 
 // Unlocks the vault.
 // The vault needs to be already authenticated.
-func Unlock(password string) (session string, errOut string, success bool) {
+func unlock(password string) (
+	session string,
+	errOut string,
+	success bool,
+) {
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer
 
@@ -65,8 +77,11 @@ func Unlock(password string) (session string, errOut string, success bool) {
 	return stdout.String(), "", true
 }
 
-// Synchronized the changes in the vault.
-func Sync(session string) (errOut string, success bool) {
+// Synchronizes the changes in the vault.
+func sync(session string) (
+	errOut string,
+	success bool,
+) {
 	cmd := exec.Command("bw", "sync")
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "BW_SESSION="+session)
@@ -83,7 +98,11 @@ func Sync(session string) (errOut string, success bool) {
 // Retrieves the notes item content.
 // The item parameter can be the item name or its ID.
 // A logged in session must be provided.
-func GetNotesItem(session string, item string) (content string, errOut string, success bool) {
+func getNotesItem(session string, item string) (
+	content string,
+	errOut string,
+	success bool,
+) {
 	cmd := exec.Command("bw", "get", "notes", item)
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "BW_SESSION="+session)
@@ -99,7 +118,11 @@ func GetNotesItem(session string, item string) (content string, errOut string, s
 
 // Retrieves all the folders.
 // A logged in session must be provided.
-func ListFolders(session string) (folders []Folder, errOut string, success bool) {
+func listFolders(session string) (
+	folders []Folder,
+	errOut string,
+	success bool,
+) {
 	var response []Folder
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer
@@ -130,9 +153,13 @@ func ListFolders(session string) (folders []Folder, errOut string, success bool)
 	return validFolders, "", true
 }
 
-// List all items in the given folder.
+// Lists all items in the given folder.
 // A logged in session must be provided.
-func ListItemsInFolder(session string, folder Folder) (items []Item, errOut string, success bool) {
+func listItemsInFolder(session string, folder Folder) (
+	items []Item,
+	errOut string,
+	success bool,
+) {
 	var response []Item
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer
@@ -154,4 +181,25 @@ func ListItemsInFolder(session string, folder Folder) (items []Item, errOut stri
 	}
 
 	return response, "", true
+}
+
+// Retrieves the Bitwarden CLI version.
+func getVersion() (
+	version string,
+	errOut string,
+	success bool,
+) {
+	var stderr bytes.Buffer
+	var stdout bytes.Buffer
+
+	cmd := exec.Command("bw", "--version")
+	cmd.Stderr = &stderr
+	cmd.Stdout = &stdout
+
+	err := cmd.Run()
+	if err != nil {
+		return "", stderr.String(), false
+	}
+
+	return stdout.String(), "", true
 }
